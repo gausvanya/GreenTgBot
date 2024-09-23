@@ -164,3 +164,5 @@ cython_debug/
 ngrok.exe
 /app/bot/DataBase/db.sqlite3-shm
 /app/bot/DataBase/db.sqlite3-wal
+my_account.session
+my_account.session-journal
