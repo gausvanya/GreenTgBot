@@ -137,7 +137,7 @@ async def remove_moder_handler(message: Message, args=None):
     if agents:
         if args[1] in ['снять', 'разжаловать']:
             await get_user_admin.delete()
-            await message.answer(f'Модератор {user_mention} разжалован')
+            await message.answer(f'✅ Модератор {user_mention} разжалован')
         else:
             if get_user_admin.rang - 1 < 1:
                 await get_user_admin.delete()
