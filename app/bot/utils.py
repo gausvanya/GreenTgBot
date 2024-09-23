@@ -31,3 +31,27 @@ def clear_text(text: str) -> str:
         allow_unicode=True,
     )
     return cleared_text
+
+
+def get_admin_name_from_rang(rang: int) -> str:
+    name_from_rang = {
+        0: 'Участник',
+        1: 'Модератор',
+        2: 'Старший Модератор',
+        3: 'Администратор',
+        4: 'Старший Администратор',
+        5: 'Создатель'
+    }
+    return name_from_rang[rang]
+
+
+def get_emoji_rang_admin(rang: int) -> str:
+    name_from_rang = {
+        0: '0️⃣',
+        1: '1️⃣',
+        2: '2️⃣',
+        3: '3️⃣',
+        4: '4️⃣',
+        5: '5️⃣'
+    }
+    return name_from_rang[rang]
