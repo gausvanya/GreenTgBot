@@ -162,3 +162,5 @@ cython_debug/
 .idea/
 
 ngrok.exe
+/app/bot/DataBase/db.sqlite3-shm
+/app/bot/DataBase/db.sqlite3-wal
