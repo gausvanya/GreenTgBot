@@ -25,3 +25,24 @@ def add_bot_administration_keyboard() -> InlineKeyboardMarkup:
         ]
     )
     return keyboard
+
+
+def report_chat_keyboard() -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='🗑 Удалить жалобу', callback_data=f'delete_report_chat')
+            ]
+        ]
+    )
+    return keyboard
+
+
+def report_admin_keyboard(chat_id: int, user_id: int, message_link: str) -> InlineKeyboardMarkup:
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text='📎 Перейти к сообщению', url=message_link)],
+            [InlineKeyboardButton(text='🗑 Удалить жалобу', callback_data='delete_report_admin'),
+            InlineKeyboardButton(text='🛑 Заблокировать', callback_data=f'ban_user_{chat_id}_{user_id}')],
+        ]
+    )
+    return keyboard

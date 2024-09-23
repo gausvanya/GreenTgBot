@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from aiogram.filters import ChatMemberUpdatedFilter, JOIN_TRANSITION, LEAVE_TRANSITION
 from aiogram.types import Message, ChatMemberUpdated
 from aiogram import Router, F
 
-from ..DataBase.Models import Welcome, User
+from ..DataBase.Models import Welcome, User, AntiSpam, Statistic
 from ..Filters import Command, GetUserInfo  # , IsAdminFilter
 from ..KeyBoards import add_bot_administration_keyboard
 from ..utils import get_user_mention
@@ -17,10 +19,68 @@ async def add_bot_in_chat_handler(message: ChatMemberUpdated) -> None:
         'Выдать права администратора мне можно по кнопке ниже или по гайду:\n'
         'Переходим в настройки чата -> переходим в раздел «Администраторы» -> нажимаете «Добавить администратора» -> '
         'ищите в участниках бота -> кликаете на него -> выдаёте <b>ВСЕ</> права кроме анонимности.\n\n'
-        '📝 <a href="https://teletype.in/@support_bot/suuportcommands">Мой список команд</> \n'
-        '📣 <a href="https://t.me/chann_support">Официальный канал</>',
+        '📝 <a href="https://teletype.in/">Мой список команд</> \n'
+        '📣 <a href="https://t.me/">Официальный канал</>',
         reply_markup=add_bot_administration_keyboard()
     )
+
+
+async def check_antispam_status(message: ChatMemberUpdated) -> bool:
+    user = message.new_chat_member.user
+    user_mention = get_user_mention(user.id, user.username, user.full_name)
+
+    result = await AntiSpam.filter(
+        user_id=user.id,
+        activity=True
+    ).first()
+
+    if result:
+        get_chat_member = await message.bot.get_chat_member(message.chat.id, message.from_user.user.id)
+
+        if get_chat_member.status in ('creator', 'administrator'):
+            await message.answer(
+                '📛 Внимание!\n'
+                f'Вы пригласили {user_mention} в чат\n'
+                'Он находится в базе АнтиСпам\n'
+                f'💬 Причина: {result.reason}'
+            )
+            return True
+        else:
+            await message.bot.ban_chat_member(message.chat.id, user.id)
+            try:
+                await message.bot.send_message(chat_id=user.id,
+                                               text='📛  Ваша заявка на вступление в чат отклонена\n'
+                                                    'Вы находитесь в базе АнтиСпам бота\n'
+                                                    f'💬 Причина: {result.reason}\n\n'
+                                                    f'Во всем вопросам в чат тех-поддержи')
+            except:
+                pass
+
+            await message.answer(
+                '📛 Внимание!\n'
+                f'Пользователь {user_mention} находится в базе АнтиСпам\n'
+                f'💬 Причина: {result.reason}\n'
+                '➖ Исключаю...'
+            )
+        return False
+
+
+async def registration_user_chat(message: ChatMemberUpdated):
+    user = message.new_chat_member.user
+
+    result = await Statistic.filter(
+        chat_id=message.chat.id,
+        user_id=user.id
+    ).first()
+
+    if not result:
+        date = datetime.now().strftime('%d.%m.%Y')
+        await Statistic.create(
+            chat_id=message.chat.id,
+            user_id=user.id,
+            count=0,
+            date=date
+        )
 
 
 @rt.chat_member(ChatMemberUpdatedFilter(JOIN_TRANSITION))
@@ -44,9 +104,15 @@ async def join_chat_member_handler(message: ChatMemberUpdated) -> None | Message
 
     if user_id != admin_id:
         await message.answer(f'👋 {user_mention} присоединился к чату\n'
-                             f'Добавил: {admin_mention}')
+                             f'➕ Добавил: {admin_mention}')
     else:
         await message.answer(f'👋 {user_mention} присоединился к чату')
+
+    antispam = await check_antispam_status(message)
+    if antispam:
+        return
+
+    await registration_user_chat(message)
 
     result = await Welcome.filter(
         chat_id=chat_id

@@ -17,7 +17,7 @@ async def ping_bot_handler(message: Message, args=None):
         return
 
     start_time = datetime.now()
-    ping_msg = await message.reply('❗️ Проверка пинга, сообщение изменится для получения')
+    await message.bot.get_me()
     end_time = datetime.now()
     ping_time = (end_time - start_time).microseconds // 1000
 
@@ -34,4 +34,5 @@ async def ping_bot_handler(message: Message, args=None):
         ping_status = "ужасный"
         emoji = "🚶‍♂‍➡️"
 
-    await ping_msg.edit_text(f'🏓 Пинг <b>{ping_status}</>\n{emoji}Скорость: <b>{ping_time} мс</>')
+    await message.answer('🏓 <b>ПОНГ!</>\n\n'
+                             f'{emoji} Ответ: <b>{ping_status} | {ping_time} мс.</> ')

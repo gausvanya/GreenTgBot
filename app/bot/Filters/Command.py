@@ -9,7 +9,7 @@ class Command(BaseFilter):
     def __init__(self, commands: Union[list[str], str], prefixes: List[str] = None, html_parse_mode: bool = False):
         self.commands = commands
         self.html_parse_mode = html_parse_mode
-        self.prefixes = prefixes if prefixes is not None else ['сап ', '.', '. ', '!', '! ', '/', '/ ', '']
+        self.prefixes = prefixes if prefixes is not None else ['грин ', 'сап ', '.', '. ', '!', '! ', '/', '/ ', '']
 
     async def __call__(self, message: Message):
         if message.text is None and message.caption is None:
