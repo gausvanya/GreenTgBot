@@ -3,7 +3,7 @@ from aiogram.types import Message, ChatMemberUpdated
 from aiogram import Router, F
 
 from ..DataBase.Models import Welcome, User
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, GetUserInfo  # , IsAdminFilter
 from ..KeyBoards import add_bot_administration_keyboard
 from ..utils import get_user_mention
 
@@ -150,6 +150,48 @@ async def get_chat_welcome_handler(message: Message, args=None) -> None | Messag
         return await message.answer('🛑 Приветствие чата еще не установлено')
 
     welcome_text = result.text
+    photo_id = result.photo_id
+
+    if photo_id:
+        await message.answer_photo(photo=photo_id, caption=f'👋 <b>Приветствие:</>\n{welcome_text}')
+    else:
+        await message.answer(f'👋 <b>Приветствие:</>\n{welcome_text}')
+
+
+@rt.message(Command(
+    commands=['поприветствуй'],
+    html_parse_mode=True),
+)
+async def command_welcome_user_handler(message: Message, args=None) -> None | Message:
+    #check_admin = IsAdminFilter(args[1])
+    #if not await check_admin(message):
+    #    return
+
+    split = args[0].split('\n', 1)[0]
+
+    if len(split.split()) > 1:
+        user = GetUserInfo(split.split(maxsplit=1)[1].rstrip())
+        user = await user(message)
+
+        if not user:
+            return
+
+        user_id, user_username, user_full_name = user
+
+    elif message.reply_to_message:
+        reply_user = message.reply_to_message.from_user
+        user_id, user_username, user_full_name = reply_user.id, reply_user.username, reply_user.full_name
+    else:
+        return
+
+    user_mention = get_user_mention(user_id, user_username, user_full_name)
+
+    result = await Welcome.filter(chat_id=message.chat.id).first()
+
+    if not result:
+        return await message.answer('🛑 Приветствие чата не установлено')
+
+    welcome_text = result.text.replace('{имя}', user_mention)
     photo_id = result.photo_id
 
     if photo_id:

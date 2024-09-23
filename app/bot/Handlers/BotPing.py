@@ -6,9 +6,8 @@ from ..Filters import Command #, IsAdminFilter
 
 rt = Router()
 
-@rt.message(Command(
-    commands=['пинг', 'ping'])
-)
+
+@rt.message(Command(commands=['пинг', 'ping']))
 async def ping_bot_handler(message: Message, args=None):
     #check_admin = IsAdminFilter(args[1])
     #if not await check_admin(message):

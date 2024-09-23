@@ -23,3 +23,11 @@ def logging_bot_config():
         "LOGGING_LEVEL": env["LOGGING_LEVEL"],
         "LOGGING_FORMAT": env["LOGGING_FORMAT"]
     }
+
+
+# LOAD USERBOT SETTINGS
+def pyrogram_config():
+    return {
+        "API_ID": env["UB_API_ID"],
+        "API_HASH": env["UB_API_HASH"]
+    }

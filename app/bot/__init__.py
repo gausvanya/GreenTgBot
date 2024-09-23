@@ -8,7 +8,8 @@ from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_applicati
 from app.config import webhook_bot_config
 from .Handlers import root_router
 from .lib.wiki_api import WikiAPI
-
+from .lib.UserBot import start_userbot
+from .DataBase import db_start, db_close
 
 router = Router()
 cfg = webhook_bot_config()
@@ -17,6 +18,8 @@ cfg = webhook_bot_config()
 async def on_startup(bot: Bot) -> None:
     await bot.set_webhook(f"{cfg['BASE_WEBHOOK_URL']}{cfg['WEBHOOK_PATH']}", secret_token=cfg['WEBHOOK_SECRET'],
                           allowed_updates=['message', 'callback_query', 'my_chat_member', 'chat_member'])
+    await db_start()
+    await start_userbot()
 
 
 def start() -> None:
