@@ -8,7 +8,7 @@ rt = Router()
 
 
 @rt.message(Command(
-    commands=['ид', 'айди'],
+    commands=['ид', 'айди', 'мой ид'],
     html_parse_mode=True)
 )
 async def user_id_handler(message: Message, args=None) -> None | Message:
@@ -16,12 +16,14 @@ async def user_id_handler(message: Message, args=None) -> None | Message:
     #if not await check_admin(message):
     #    return
 
-    if len(args[0].split('\n', 1)[0].split()) == 1 and not message.reply_to_message:
+    split = args[0].split('\n', 1)[0]
+
+    if len(split.split()) == 2 and split.startswith('мой ид') or len(split.split()) == 1 and not message.reply_to_message:
         from_user = message.from_user
         user_id, user_username, user_full_name = from_user.id, from_user.username, from_user.full_name
     else:
-        if len(args[0].split('\n', 1)[0].split()) > 1:
-            user = GetUserInfo(args[0].split('\n', 1)[0].split(maxsplit=1)[1].rstrip())
+        if len(split.split()) > 1:
+            user = GetUserInfo(split.split(maxsplit=1)[1].rstrip())
             user = await user(message)
 
             if not user:
