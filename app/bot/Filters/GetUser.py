@@ -14,7 +14,7 @@ class GetUserInfo:
 
     @staticmethod
     def clean_user_input(user: str) -> str:
-        cleaned_user = re.sub(r'@|https?://t\.me/|tg://openmessage\?user_id=|tg://user\?id=|<a href="tg://user\?id=|">.*', '', user)
+        cleaned_user = re.sub(r'@|https?://t\.me/|t.me/|tg://openmessage\?user_id=|tg://user\?id=|<a href="tg://user\?id=|">.*', '', user)
         return cleaned_user.strip()
 
     async def __call__(self, message: Message):
