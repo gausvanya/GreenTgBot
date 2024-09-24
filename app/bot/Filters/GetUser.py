@@ -13,14 +13,19 @@ class GetUserInfo:
 
 
     @staticmethod
-    def clean_user_input(user: str) -> str:
+    def clean_user_input(user: str) -> str | None:
+        if not user.startswith(('@', '<a href="', 't.me/', 'https://t.me/', 'tg://openmessage', 'tg://user?id=')):
+            return
+
         cleaned_user = re.sub(r'@|https?://t\.me/|t.me/|tg://openmessage\?user_id=|tg://user\?id=|<a href="tg://user\?id=|">.*', '', user)
         return cleaned_user.strip()
 
     async def __call__(self, message: Message):
-        user = self.clean_user_input(str(self.user)).lower()
+        user = self.clean_user_input(str(self.user))
 
         if user:
+            user = user.lower()
+
             if user.isdigit():
                 self.user_info = await User.filter(id=user).first()
             else:
