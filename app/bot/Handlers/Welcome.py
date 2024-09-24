@@ -23,6 +23,7 @@ async def add_bot_in_chat_handler(message: ChatMemberUpdated) -> None:
         '📣 <a href="https://t.me/">Официальный канал</>',
         reply_markup=add_bot_administration_keyboard()
     )
+    await registration_user_chat(message)
 
 
 async def check_antispam_status(message: ChatMemberUpdated) -> bool:
