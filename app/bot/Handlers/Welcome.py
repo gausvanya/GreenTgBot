@@ -1,10 +1,10 @@
 from datetime import datetime
 
-from aiogram.filters import ChatMemberUpdatedFilter, JOIN_TRANSITION, LEAVE_TRANSITION
+from aiogram.filters import ChatMemberUpdatedFilter, JOIN_TRANSITION, LEAVE_TRANSITION, IS_MEMBER, IS_ADMIN
 from aiogram.types import Message, ChatMemberUpdated
 from aiogram import Router, F
 
-from ..DataBase.Models import Welcome, User, AntiSpam, Statistic
+from ..DataBase.Models import Welcome, User, AntiSpam, Statistic, Admins, ChatSettings
 from ..Filters import Command, GetUserInfo , IsAdminFilter
 from ..KeyBoards import add_bot_administration_keyboard
 from ..utils import get_user_mention
@@ -24,6 +24,27 @@ async def add_bot_in_chat_handler(message: ChatMemberUpdated) -> None:
         reply_markup=add_bot_administration_keyboard()
     )
     await registration_user_chat(message)
+
+
+@rt.my_chat_member(ChatMemberUpdatedFilter(IS_MEMBER >> IS_ADMIN))
+async def set_administrator_chat_bot_handler(message: ChatMemberUpdated) -> None:
+    print('aadefe')
+    result = await Admins.filter(user_id=message.from_user.id).first()
+    if result is None:
+        await Admins.create(user_id=message.from_user.id, chat_id=message.chat.id, rang=5)
+
+    result = await ChatSettings.filter(chat_id=message.chat.id).first()
+    print(result)
+    if result is None:
+        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+        await ChatSettings.create(
+            chat_id=message.chat.id,
+            default_time_ban='навсегда',
+            default_time_mute = '1_час',
+            default_time_warn = '7_дней',
+            default_limit_warn = '3',
+            default_result_warn = 'бан_навсегда'
+        )
 
 
 async def check_antispam_status(message: ChatMemberUpdated) -> bool:
