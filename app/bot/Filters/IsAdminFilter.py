@@ -1,18 +1,19 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message
 
+from app.bot.DataBase.Models import AccessCommand, Admins
+from app.bot.utils import get_admin_name_from_rang, vault_access_command
 
 
 class IsAdminFilter(BaseFilter):
     def __init__(self, command: str):
         self.command = command.lower()
-        print(self.command)
 
     async def __call__(self, message: Message) -> bool:
-        result = await AccessCommand.get_or_none(
+        result = await AccessCommand.filter(
             chat_id=message.chat.id,
             command=self.command
-        )
+        ).first()
 
         if result:
             rang_cmd = result.rang
