@@ -22,6 +22,7 @@ async def wiki_request_handler(message: Message, wiki_api: 'WikiAPI', args=None)
     wiki_query = args[0].split(maxsplit=1)[1]
     wiki_response: 'WikiArticleResponse' = await wiki_api.get_article(wiki_query)
 
+    print(wiki_response)
     if not wiki_response:
         return await message.answer('Ошибка получения запроса\n'
                                     'Попробуйте еще раз позже')
@@ -29,6 +30,11 @@ async def wiki_request_handler(message: Message, wiki_api: 'WikiAPI', args=None)
     title = wiki_response.title
     summary = wiki_response.summary
     wiki_url = wiki_response.article_url
+    photo_url = wiki_response.photo_url
 
-    await message.answer(f'📝 <b>{title}</>\n\n{summary}\n\n'
-                         f'↪️ <a href="{wiki_url}">Узнать подробнее</>')
+    if photo_url is None:
+        await message.answer(f'📝 <b>{title}</>\n\n{summary}\n\n'
+                             f'↪️ <a href="{wiki_url}">Узнать подробнее</>')
+    else:
+        await message.answer_photo(photo_url, f'📝 <b>{title}</>\n\n{summary}\n\n'
+                             f'↪️ <a href="{wiki_url}">Узнать подробнее</>')
