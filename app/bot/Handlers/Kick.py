@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram import Router, F
 
-from ..Filters import GetUserInfo, Command #, IsAdminFilter
+from ..Filters import GetUserInfo, Command, IsAdminFilter
 from ..utils import get_user_mention
 
 import asyncio
@@ -15,9 +15,9 @@ rt = Router()
     F.chat.type != 'private',
 )
 async def kick_user_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)[0]
 

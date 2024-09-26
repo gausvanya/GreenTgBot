@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram import Router
 
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -12,9 +12,9 @@ rt = Router()
 
 @rt.message(Command(commands=['wiki', 'вики']))
 async def wiki_request_handler(message: Message, wiki_api: 'WikiAPI', args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split()) < 2:
         return await message.reply('📋 Укажите свой запрос')

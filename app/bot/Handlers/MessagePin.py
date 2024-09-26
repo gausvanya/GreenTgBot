@@ -1,7 +1,7 @@
 from aiogram.types import Message
 from aiogram import Router, F
 
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 
 rt = Router()
 
@@ -11,9 +11,9 @@ rt = Router()
     F.chat.type != 'private'
 )
 async def pin_message_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split('\n', 1)[0].split()) > 1:
         return
@@ -32,9 +32,9 @@ async def pin_message_handler(message: Message, args=None) -> None | Message:
     F.chat.type != 'private',
 )
 async def unpin_message_handler(message: Message, args=None):
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split('\n', 1)[0].split()) > 1:
         return

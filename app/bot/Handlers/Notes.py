@@ -3,7 +3,7 @@ from aiogram import Router, F
 
 from tortoise.functions import Max
 
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 from ..DataBase.Models import Notes
 
 rt = Router()
@@ -15,9 +15,9 @@ rt = Router()
     F.chat.type != 'private',
 )
 async def add_chat_note_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
@@ -48,7 +48,7 @@ async def add_chat_note_handler(message: Message, args=None) -> None | Message:
         number=max_note_number + 1
     )
 
-    await message.answer(f'✅ Заметка <b>{note_name} (#{max_note_number + 1})</> создана')
+    await message.answer(f'✅ Заметка <b>{note_name} ({max_note_number + 1})</> создана')
 
 
 @rt.message(Command(
@@ -57,9 +57,9 @@ async def add_chat_note_handler(message: Message, args=None) -> None | Message:
     F.chat.type != 'private'
 )
 async def remove_chat_note_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
@@ -98,9 +98,9 @@ async def remove_chat_note_handler(message: Message, args=None) -> None | Messag
     F.chat.type != 'private'
 )
 async def get_notes_list_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split('\n', 1)[0].split()) > 1:
         return
@@ -116,7 +116,7 @@ async def get_notes_list_handler(message: Message, args=None) -> None | Message:
 
     note_text = '📝 <b>Заметки чата:</>\n'
     for note in result:
-        note_text += f'#{note.number}. <code>{note.name}</>\n'
+        note_text += f'{note.number}. <code>{note.name}</>\n'
 
     await message.answer(note_text + '\n\n💬 Чтобы открыть заметку пропишите: <code>!заметка [название | номер]</>')
 
@@ -126,9 +126,9 @@ async def get_notes_list_handler(message: Message, args=None) -> None | Message:
     F.chat.type != 'private'
 )
 async def get_note(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
@@ -165,9 +165,9 @@ async def get_note(message: Message, args=None) -> None | Message:
     F.chat.type != 'private'
 )
 async def edit_note_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 

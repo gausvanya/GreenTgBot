@@ -5,7 +5,7 @@ from aiogram.types import Message, ChatMemberUpdated
 from aiogram import Router, F
 
 from ..DataBase.Models import Welcome, User, AntiSpam, Statistic
-from ..Filters import Command, GetUserInfo  # , IsAdminFilter
+from ..Filters import Command, GetUserInfo , IsAdminFilter
 from ..KeyBoards import add_bot_administration_keyboard
 from ..utils import get_user_mention
 
@@ -151,9 +151,9 @@ async def leave_chat_member_handler(message: ChatMemberUpdated) -> None:
     F.chat.type != 'private',
 )
 async def set_welcome_chat_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
@@ -182,9 +182,9 @@ async def set_welcome_chat_handler(message: Message, args=None) -> None | Messag
     F.chat.type != 'private',
 )
 async def remove_chat_welcome_handler(message: Message, args=None) -> None:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len( args[0].split('\n', 1)[0].split()) > 1:
         return
@@ -202,9 +202,9 @@ async def remove_chat_welcome_handler(message: Message, args=None) -> None:
     F.chat.type != 'private',
 )
 async def get_chat_welcome_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
@@ -230,9 +230,9 @@ async def get_chat_welcome_handler(message: Message, args=None) -> None | Messag
     html_parse_mode=True),
 )
 async def command_welcome_user_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)[0]
 

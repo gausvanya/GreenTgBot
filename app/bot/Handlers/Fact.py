@@ -4,16 +4,16 @@ from aiogram import Router
 from deep_translator import GoogleTranslator
 import randfacts
 
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 
 rt = Router()
 
 
 @rt.message(Command(commands=['факт']))
 async def get_random_fact_handler(message: Message, args=None) -> None:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split('\n', 1)[0].split()) > 1:
         return

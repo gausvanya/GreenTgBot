@@ -2,16 +2,16 @@ from aiogram.types import Message
 from aiogram import Router
 
 from datetime import datetime
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 
 rt = Router()
 
 
 @rt.message(Command(commands=['пинг', 'ping']))
 async def ping_bot_handler(message: Message, args=None):
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     if len(args[0].split('\n', 1)[0].split()) > 1:
         return

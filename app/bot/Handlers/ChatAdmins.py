@@ -1,7 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import Message
 
-from ..Filters import GetUserInfo, Command #, IsAdminFilter
+from ..Filters import GetUserInfo, Command, IsAdminFilter
 from ..lib.UserBot import get_user_status
 from ..utils import get_user_mention, get_admin_name_from_rang, get_emoji_rang_admin
 from ..DataBase.Models import User, Admins, Agents
@@ -21,9 +21,9 @@ async def add_moder_handler(message: Message, args=None):
     rang = None
 
     if not agents:
-        #check_admin = IsAdminFilter(args[1])
-        #if not await check_admin(message):
-        #    return
+        check_admin = IsAdminFilter(args[1])
+        if not await check_admin(message):
+            return
         pass
 
     split = args[0].split('\n', 1)[0]
@@ -104,9 +104,9 @@ async def remove_moder_handler(message: Message, args=None):
     agents = await Agents.filter(user_id=message.from_user.id).first()
 
     if not agents:
-        #check_admin = IsAdminFilter(args[1])
-        #if not await check_admin(message):
-        #    return
+        check_admin = IsAdminFilter(args[1])
+        if not await check_admin(message):
+            return
         pass
 
     split = args[0].split('\n', 1)[0]
@@ -192,9 +192,9 @@ async def remove_moder_handler(message: Message, args=None):
 
 @rt.message(Command(commands=['кто админ', 'админы', 'модеры']), F.chat.type != 'private')
 async def chat_moder_list_handler(message: Message, args=None):
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     admins = await Admins.filter(chat_id=message.chat.id).all()
 

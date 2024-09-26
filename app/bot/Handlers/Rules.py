@@ -2,7 +2,7 @@ from aiogram.types import Message
 from aiogram import Router, F
 
 from ..DataBase.Models import Rules
-from ..Filters import Command #, IsAdminFilter
+from ..Filters import Command, IsAdminFilter
 
 rt = Router()
 
@@ -13,9 +13,9 @@ rt = Router()
     F.chat.type != 'private'
 )
 async def set_rules_chat_handler(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)
 
