@@ -11,3 +11,4 @@ from .Ignore import Ignore
 from .Bans import Bans
 from .Statistic import Statistic
 from .AccessCommand import AccessCommand
+from .ChatSettings import ChatSettings
