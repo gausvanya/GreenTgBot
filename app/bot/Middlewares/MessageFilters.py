@@ -15,7 +15,6 @@ class MessageFilters(BaseMiddleware):
     ) -> Any:
         check_filters = MessageFilter()
         a = await check_filters(event)
-        print(a)
 
         return await handler(event, data)
 

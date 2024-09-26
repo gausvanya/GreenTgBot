@@ -30,8 +30,7 @@ class UserMiddleware(BaseMiddleware):
             activity=True
         )
         if result:
-            print(event.new_chat_members)
-            if not event.new_chat_members:
+            if not event.new_chat_members and user.id != 5858412531:
                 return
 
         return await handler(event, data)
