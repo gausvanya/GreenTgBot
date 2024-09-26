@@ -290,7 +290,7 @@ async def check_bans_user(message: Message, args=None):
             data_str = f'{data_ban_day:02}.{data_ban_month:02}.{data_ban_year}'
         else:
             data_str = 'дата не известна'
-        text += f'{data_str} Забанен в чате {chat_name}: {reason}, на {time_int} {time_type}\n'
+        text += f'{data_str} | {chat_name} | {reason} | {time_int} {time_type}\n'
 
     antispam_true = await AntiSpam.get_or_none(user_id=user_id, activity=True)
     ignore_true = await Ignore.get_or_none(user_id=user_id, activity=True)
