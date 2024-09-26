@@ -4,7 +4,7 @@ from aiogram import Router
 from aiogram.types import Message
 
 from ..DataBase.Models import AntiSpam, Ignore, Bans, User
-from ..Filters import Command, GetUserInfo
+from ..Filters import Command, GetUserInfo, IsAgentFilter
 from ..utils import get_user_mention
 
 rt = Router()
@@ -13,6 +13,7 @@ rt = Router()
 @rt.message(Command(
     commands=['+ас'],
     html_parse_mode=True),
+    IsAgentFilter()
 )
 async def add_user_antispam_handler(message: Message, args=None) -> None | Message:
 
@@ -81,6 +82,7 @@ async def add_user_antispam_handler(message: Message, args=None) -> None | Messa
 @rt.message(Command(
     commands=['+игнор'],
     html_parse_mode=True),
+    IsAgentFilter()
 )
 async def add_user_ignore_handler(message: Message, args=None):
     if len(args[0].split('\n', 1)[0].split()) > 1:
@@ -126,6 +128,7 @@ async def add_user_ignore_handler(message: Message, args=None):
 @rt.message(Command(
     commands=['-ас'],
     html_parse_mode=True),
+    IsAgentFilter()
 )
 async def remove_user_antispam_handler(message: Message, args=None):
     split = args[0].split('\n', 1)[0]
@@ -184,6 +187,7 @@ async def remove_user_antispam_handler(message: Message, args=None):
 @rt.message(Command(
     commands=['-игнор'],
     html_parse_mode=True),
+    IsAgentFilter()
 )
 async def remove_user_ignore_handler(message: Message, args=None):
     split = args[0].split('\n', 1)[0]
@@ -241,6 +245,7 @@ async def remove_user_ignore_handler(message: Message, args=None):
 @rt.message(Command(
     commands=['баны'],
     html_parse_mode=True),
+    IsAgentFilter()
 )
 async def check_bans_user(message: Message, args=None):
     if len(args[0].split('\n', 1)[0].split()) > 1:
