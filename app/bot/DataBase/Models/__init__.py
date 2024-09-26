@@ -10,3 +10,4 @@ from .AntiSpam import AntiSpam
 from .Ignore import Ignore
 from .Bans import Bans
 from .Statistic import Statistic
+from .AccessCommand import AccessCommand
