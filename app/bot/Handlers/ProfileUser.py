@@ -3,7 +3,7 @@ from aiogram import Router, F
 
 from ..utils import get_user_mention, get_admin_name_from_rang, get_emoji_rang_admin
 from ..DataBase.Models import Agents, Statistic, Admins
-from ..Filters import GetUserInfo, Command #, IsAdminFilter
+from ..Filters import GetUserInfo, Command, IsAdminFilter
 from ..lib.UserBot import get_user_status
 
 from datetime import datetime, timedelta
@@ -17,9 +17,9 @@ rt = Router()
     F.chat.type != 'private'
 )
 async def profile_user(message: Message, args=None) -> None | Message:
-    #check_admin = IsAdminFilter(args[1])
-    #if not await check_admin(message):
-    #    return
+    check_admin = IsAdminFilter(args[1])
+    if not await check_admin(message):
+        return
 
     split = args[0].split('\n', 1)[0].lower()
     user = None
