@@ -1,6 +1,8 @@
+from datetime import datetime
+
+from dateutil.relativedelta import relativedelta
 from slugify import slugify
 import re
-
 
 class Singleton(type):
     _instances = {}
@@ -64,7 +66,8 @@ def vault_access_command(command: str) -> int | None:
         'ид': 0, 'мой ид': 0, 'правила': 0, '+правила': 3, '-правила': 3, 'репорт': 0,
         'жалоба': 0, 'профиль': 0, 'кто ты': 0, 'кто я': 0, 'мой профиль': 0, 'заметки': 0,
         'заметка': 0, '+заметка': 3, '-заметка': 3, 'кик': 2,  'исключить': 2, 'kick': 2, 'бан': 1,
-        'чс': 1, 'мут': 1, 'пин': 1, 'закреп': 1, 'откреп': 1, 'анпин': 1, 'повысить': 4, 'понизить': 4,
+        'чс': 1, 'банлист': 1, 'листбанов': 1, 'причина': 1, 'разбан': 1, 'вернуть': 1, 'мут': 1, 'пин': 1,
+        'закреп': 1, 'откреп': 1, 'анпин': 1, 'повысить': 4, 'понизить': 4,
         'снять': 4, '+модер': 4, '-модер': 4, 'кто админ': 0, 'админы': 0, 'пинг': 0
     }
 
@@ -72,3 +75,42 @@ def vault_access_command(command: str) -> int | None:
         return commands[command]
     except KeyError:
         return None
+
+
+def get_timestamp(time_int: int, time_type: str) -> datetime | bool | None | str:
+    if time_type in ['минут', 'минута', 'минуты']:
+        dt = datetime.now() + relativedelta(minutes=time_int)
+    elif time_type in ['час', 'часа', 'часов']:
+        dt = datetime.now() + relativedelta(hours=time_int)
+    elif time_type in ['день', 'дня', 'дней', 'сутки', 'суток']:
+        dt = datetime.now() + relativedelta(days=time_int)
+    elif time_type in ['неделя', 'недели', 'недель']:
+        dt = datetime.now() + relativedelta(weeks=time_int)
+    elif time_type in ['месяц', 'месяца', 'месяцев']:
+        dt = datetime.now() + relativedelta(months=time_int)
+    elif time_type in ['год', 'года', 'лет']:
+        dt = datetime.now() + relativedelta(years=time_int)
+    elif time_type == 'навсегда':
+        dt = 'None'
+    else:
+        return
+
+    return dt
+
+
+def check_time(split: str) -> list | None:
+    try:
+        dict_time = {
+            'навсегда': [None, 'навсегда'],
+            'минута': [1, 'минута'],
+            'час': [1, 'час'],
+            'день': [1, 'день'],
+            'сутки': [1, 'день'],
+            'неделя': [1, 'неделя'],
+            'месяц': [1, 'месяц'],
+            'год': [1, 'год']
+        }
+
+        return dict_time[split]
+    except Exception:
+        return
