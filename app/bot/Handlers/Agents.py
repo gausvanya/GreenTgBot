@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from aiogram import Router, F
 from aiogram.types import Message
@@ -148,7 +148,7 @@ async def agent_list_handler(message: Message):
 async def remove_agent_handler(message: Message, args=None):
     split = args[0].split('\n', 1)[0].lower()
 
-    if len(split.split()) > 1:
+    if len(split.split()) > 2:
         user = GetUserInfo(split.split(maxsplit=2)[2].rstrip())
         user = await user(message)
 
@@ -173,10 +173,25 @@ async def remove_agent_handler(message: Message, args=None):
 
     admin_mention = get_user_mention(admin.id, admin.username, admin.full_name)
 
-
     if result.date:
         date = datetime.fromtimestamp(float(result.date))
-        date = f'{date.day:02d}.{date.month:02d}.{date.year} {date.hour:02d}:{date.minute:02d}'
+
+        # Текущая дата и время
+        now = datetime.now()
+
+        # Разница во времени
+        time_difference = now - date
+
+        if time_difference < timedelta(minutes=1):
+            date = 'только что'
+        elif time_difference < timedelta(hours=1):
+            minutes_ago = time_difference.seconds // 60
+            date = f'{minutes_ago} минут назад' if minutes_ago > 1 else 'минуту назад'
+        elif time_difference < timedelta(days=1):
+            hours_ago = time_difference.seconds // 3600
+            date = f'{hours_ago} часов назад' if hours_ago > 1 else 'час назад'
+        else:
+            date = f'{date.day:02d}.{date.month:02d}.{date.year} {date.hour:02d}:{date.minute:02d}'
     else:
         date = 'неизвестная дата'
 

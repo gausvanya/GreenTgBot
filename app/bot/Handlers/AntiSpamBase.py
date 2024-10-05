@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from aiogram import Router
-from aiogram.types import Message
+from aiogram import Router, F
+from aiogram.types import Message, CallbackQuery
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from ..DataBase.Models import AntiSpam, Ignore, Bans, User
 from ..Filters import Command, GetUserInfo, IsAgentFilter
@@ -343,3 +344,94 @@ async def check_bans_user(message: Message, args=None):
                  f'💬 Последняя причина: {reason}\n')
 
     await message.answer(text)
+
+
+
+@rt.message(Command(
+    commands=['вносы от']),
+    IsAgentFilter()
+)
+async def ac_list_for_agent(message: Message):
+    if message.entities:
+        entities = message.entities[0]
+
+        if entities.url:
+            user_info = entities.url
+        elif entities.user:
+            user_info = f'@{entities.user.id}'
+        elif entities.type == 'mention':
+            user_info = next((word for word in message.text.split('\n', 1)[0].split() if word.startswith('@')),
+                             None)
+        else:
+            user_info = None
+
+        if user_info:
+            user = await GetUserInfo(user_info)(message)
+            if not user:
+                return
+            agent_id = user[0]
+        else:
+            return
+
+    elif message.reply_to_message:
+        agent_id = message.reply_to_message.from_user.id
+    else:
+        return
+
+    await send_ac_list(message, 0, agent_id)
+
+
+async def send_ac_list(message: Message, offset: int, agent_id: int, callback_query: CallbackQuery = None):
+    antispams = await AntiSpam.filter(admin_id=agent_id).limit(10).offset(offset)
+    agent = await User.filter(id=agent_id).first()
+    user_mention = get_user_mention(agent.id, agent.username, agent.full_name)
+
+    text_ac = f'<b>Список пользователей которых внес агент {user_mention}:</>\n'
+    if antispams:
+        for antispam in antispams:
+            user = await User.get_or_none(id=antispam.user_id)
+            user_mention = get_user_mention(antispam.user_id, user.username, user.full_name)
+            ignore = await Ignore.filter(user_id=antispam.user_id, activity=True).first()
+
+            text_ac += (
+                f'🔴 {user_mention}:\n'
+                f'💬 <b>Причина вноса:</> {antispam.reason}\n'
+                f'📛 <b>АнтиСпам статус:</> {antispam.activity}\n'
+                f'🤐 <b>Игнор команд:</> {"Да" if ignore else "Нет"}\n\n'
+            )
+
+        keyboard = await page_ac_list_keyboard(offset, message, agent_id)
+
+        if callback_query:
+            await callback_query.message.edit_text(text_ac, reply_markup=keyboard.as_markup())
+        else:
+            await message.answer(text_ac, reply_markup=keyboard.as_markup())
+    else:
+        if callback_query:
+            await callback_query.message.edit_text(f"{text_ac + 'Пуст.'}")
+        else:
+            await message.answer(f"{text_ac + 'Пуст.'}")
+
+
+async def page_ac_list_keyboard(offset: int, message, agent_id: int) -> InlineKeyboardBuilder:
+    keyboard = InlineKeyboardBuilder()
+
+    if offset > 0:
+        keyboard.button(text='⬅️ Назад', callback_data=f'acbase_{offset - 10}_{agent_id}')
+    antispams = await AntiSpam.filter(admin_id=agent_id).limit(1).offset(offset + 10)
+
+    if len(antispams) > 0:
+        keyboard.button(text='Вперед ➡️', callback_data=f'acbase_{offset + 10}_{agent_id}')
+    return keyboard
+
+
+@rt.callback_query(F.data.startswith('acbase_'))
+async def handle_banlist_pagination(call: CallbackQuery):
+    user_id = int(call.data.split('_')[2])
+
+    if user_id != call.from_user.id:
+        return await call.answer('Эта кнопочка не для вас!')
+
+    offset = int(call.data.split('_')[1])
+    await send_ac_list(call.message, offset, user_id, call)
+    await call.answer()

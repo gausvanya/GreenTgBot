@@ -20,16 +20,28 @@ async def report_user_handler(message: Message, args=None) -> None | Message:
     if not await check_admin(message):
         return
 
-    split = args[0].split('\n', 1)[0]
+    if message.entities:
+        first_entity = message.entities[0]
+        entity_type = first_entity.type
+        user_url = first_entity.url
+        user = first_entity.user
 
-    if len(split.split()) > 1:
-        user = GetUserInfo(split.split(maxsplit=1)[1].rstrip())
-        user = await user(message)
+        if user_url:
+            user_info = user_url
+        elif user:
+            user_info = f'@{user.id}'
+        elif entity_type == 'mention':
+            user_info = next((word for word in message.text.split('\n', 1)[0].split() if word.startswith('@')), None)
+        else:
+            user_info = None
 
-        if not user:
+        if user_info:
+            user = await GetUserInfo(user_info)(message)
+            if not user:
+                return
+            user_id, user_username, user_full_name = user
+        else:
             return
-
-        user_id, user_username, user_full_name = user
 
     elif message.reply_to_message:
         reply_user = message.reply_to_message.from_user

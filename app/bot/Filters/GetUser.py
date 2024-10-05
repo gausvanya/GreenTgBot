@@ -11,13 +11,12 @@ class GetUserInfo:
         self.user = user
         self.user_info = None
 
-
     @staticmethod
     def clean_user_input(user: str) -> str | None:
-        if not user.startswith(('@', '<a href="', 't.me/', 'https://t.me/', 'tg://openmessage', 'tg://user?id=')):
+        if not user.startswith(('@', 't.me/', 'https://t.me/', 'tg://openmessage', 'tg://user?id=')):
             return
 
-        cleaned_user = re.sub(r'@|https?://t\.me/|t.me/|tg://openmessage\?user_id=|tg://user\?id=|<a href="tg://user\?id=|">.*', '', user)
+        cleaned_user = re.sub(r'@|https://t.me/|t.me/|tg://openmessage\?user_id=|tg://user\?id=', '', user)
         return cleaned_user.strip()
 
     async def __call__(self, message: Message):

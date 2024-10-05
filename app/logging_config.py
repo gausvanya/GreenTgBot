@@ -1,8 +1,11 @@
 import logging
+from typing import Union
+
+from app.bot.utils import InterceptHandler
 
 
-def setup(logging_format: str, logging_level: str = 'INFO'):
+def setup(logging_level: Union[str, int] = 'DEBUG'):
     logging.basicConfig(
-        format=logging_format,
-        level=logging_level
+        handlers=[InterceptHandler()],
+        level=logging.getLevelName(logging_level)
     )

@@ -45,3 +45,8 @@ async def unpin_message_handler(message: Message, args=None):
     message_url = f'https://t.me/c/{str(message.chat.id)[4:]}/{message.reply_to_message.message_id}'
     await message.reply_to_message.unpin()
     await message.answer(f'✅ <a href="{message_url}">Сообщение</> откреплено')
+
+
+@rt.message(Command('тест'))
+async def test(message: Message):
+    await message.answer(f'<a href="tg://user?id=6889986784">USER</>')

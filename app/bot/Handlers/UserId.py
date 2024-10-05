@@ -22,14 +22,26 @@ async def user_id_handler(message: Message, args=None) -> None | Message:
         from_user = message.from_user
         user_id, user_username, user_full_name = from_user.id, from_user.username, from_user.full_name
     else:
-        if len(split.split()) > 1:
-            user = GetUserInfo(split.split(maxsplit=1)[1].rstrip())
-            user = await user(message)
+        if message.entities:
+            entities = message.entities[0]
 
-            if not user:
+            if entities.url:
+                user_info = entities.url
+            elif entities.user:
+                user_info = f'@{entities.user.id}'
+            elif entities.type == 'mention':
+                user_info = next((word for word in message.text.split('\n', 1)[0].split() if word.startswith('@')),
+                                 None)
+            else:
+                user_info = None
+
+            if user_info:
+                user = await GetUserInfo(user_info)(message)
+                if not user:
+                    return
+                user_id, user_username, user_full_name = user
+            else:
                 return
-
-            user_id, user_username, user_full_name = user
 
         elif message.reply_to_message:
             reply_user = message.reply_to_message.from_user

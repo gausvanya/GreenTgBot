@@ -22,7 +22,6 @@ async def profile_user(message: Message, args=None) -> None | Message:
         return
 
     split = args[0].split('\n', 1)[0].lower()
-    user = None
 
     if split in ['мой профиль', 'кто я'] or split == 'профиль' and len(split.split()) == 1:
         user = message.from_user
@@ -30,11 +29,28 @@ async def profile_user(message: Message, args=None) -> None | Message:
         profile_photo = await message.from_user.get_profile_photos(limit=1)
         is_bot = message.from_user.is_bot
     else:
-        if split.startswith('кто ты') and len(split.split()) > 2:
-            user = GetUserInfo(split.split(maxsplit=2)[2].rstrip())
+        if message.entities:
+            entities = message.entities[0]
 
-        elif split.startswith('профиль') and len(split.split()) > 1:
-            user = GetUserInfo(args[0].split('\n', 1)[0].split(maxsplit=1)[1].rstrip())
+            if entities.url:
+                user_info = entities.url
+            elif entities.user:
+                user_info = f'@{entities.user.id}'
+            elif entities.type == 'mention':
+                user_info = next((word for word in message.text.split('\n', 1)[0].split() if word.startswith('@')),
+                                 None)
+            else:
+                user_info = None
+
+            if user_info:
+                user = await GetUserInfo(user_info)(message)
+                if not user:
+                    return
+                user_id, user_username, user_full_name = user
+                profile_photo = await message.bot.get_user_profile_photos(limit=1, user_id=user_id)
+                is_bot = (await message.bot.get_chat_member(message.chat.id, user_id)).user.is_bot
+            else:
+                return
 
         elif message.reply_to_message:
             reply_user = message.reply_to_message.from_user
@@ -43,15 +59,6 @@ async def profile_user(message: Message, args=None) -> None | Message:
             is_bot = reply_user.is_bot
         else:
             return
-
-        if user:
-            user = await user(message)
-            if not user:
-                return
-
-            user_id, user_username, user_full_name = user
-            profile_photo = await message.bot.get_user_profile_photos(limit=1, user_id=user_id)
-            is_bot = (await message.bot.get_chat_member(message.chat.id, user_id)).user.is_bot
 
     user_mention = get_user_mention(user_id, user_username, user_full_name)
     chat_member = await message.bot.get_chat_member(message.chat.id, user_id)
@@ -112,7 +119,7 @@ async def profile_user(message: Message, args=None) -> None | Message:
         f'{emoji_rang} ранг: {admin_rang_name}\n'
         f'▶️ Тг-статус: {get_status}\n'
         f'🕰 Первое появление: {first_appearance[0]["date"]}\n'
-        f'⚡️ Статистика(дн | нед | мес | всего): {day_stat} | {week_stat} | {month_stat} | {total_stat}'
+        f'⚡️ Статистика (дн | нед | мес | всего): {day_stat} | {week_stat} | {month_stat} | {total_stat}'
     )
 
     if profile_photo.photos:

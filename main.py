@@ -6,7 +6,6 @@ cfg = logging_bot_config()
 
 def main() -> None:
     logging_config.setup(
-        logging_format=cfg["LOGGING_FORMAT"],
         logging_level=cfg["LOGGING_LEVEL"]
     )
 
